@@ -1,6 +1,7 @@
 using Server.Data;
 using Shared.Models;
 using Shared.Services;
+using Shared.DataTransferObjects;
 
 namespace Server.Services;
 
@@ -8,12 +9,14 @@ public class BookService(LibraryDbContext context) : IBookService
 {
     private readonly LibraryDbContext _context = context;
 
-    public async Task<ServiceResponse<List<Book>>> GetAllBooks()
+    public async Task<ServiceResponse<List<BookDto>>> GetAllBooks()
     {
         // throw new NotImplementedException();
-        ServiceResponse<List<Book>> response = new ServiceResponse<List<Book>>();
-        response.Data = _context.Books.ToList();
-        return response;
+        // ServiceResponse<List<Book>> response = new ServiceResponse<List<Book>>();
+        // response.Data = _context.Books.ToList();
+        // return response;
+
+        var response = new ServiceResponse<List<BookDto>>();
     }
 
     public async Task<ServiceResponse<Book>> GetBookById(int Id)
@@ -40,7 +43,7 @@ public class BookService(LibraryDbContext context) : IBookService
         ServiceResponse<Book> response = new ServiceResponse<Book>();
         Book book = _context.Books.FirstOrDefault(book => book.Id == updateBook.Id);
         book.BookTitle = updateBook.BookTitle;
-        book.Authors = updateBook.Authors;
+        book.BookAuthors = updateBook.BookAuthors;
         book.Category = updateBook.Category;
         book.Status = updateBook.Status;
         book.NumberOfPages = updateBook.NumberOfPages;

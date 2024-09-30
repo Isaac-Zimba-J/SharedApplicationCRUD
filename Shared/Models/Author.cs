@@ -6,5 +6,6 @@ public class Author
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public DateOnly DOB { get; set; }
-    public List<Book>? Books { get; set; }
+
+    public List<BookAuthor> BookAuthors { get; set; }
 }

@@ -35,7 +35,7 @@ public class AuthorService(LibraryDbContext context) : IAuthorService
     }
     
 
-    public Task<ServiceResponse<Author>> UpdateAuthor(Author updateAuthor)
+    public async Task<ServiceResponse<Author>> UpdateAuthor(Author updateAuthor)
     {
         // throw new NotImplementedException();
         ServiceResponse<Author> response = new ServiceResponse<Author>();
@@ -43,12 +43,20 @@ public class AuthorService(LibraryDbContext context) : IAuthorService
         author.FirstName = updateAuthor.FirstName;
         author.LastName = updateAuthor.LastName;
         author.DOB = updateAuthor.DOB;
+        await _context.SaveChangesAsync();
+        response.Data = author;
+        return response;
         
 
     }
 
-    public Task<ServiceResponse<Author>> DeleteAuthor(int id)
+    public async Task<ServiceResponse<Author>> DeleteAuthor(int id)
     {
-        throw new NotImplementedException();
+        // throw new NotImplementedException();
+        ServiceResponse<Author> response = new ServiceResponse<Author>();
+        Author author = _context.Authors.FirstOrDefault(author => author.Id == id);
+       _context.Authors.Remove(author);
+        
+        return response;
     }
 }
