@@ -13,28 +13,28 @@ namespace Server.Data
         {
             base.OnModelCreating(modelBuilder);
             
-            
-            modelBuilder.Entity<Book>()
-                .HasKey(book => book.Id);
-            modelBuilder.Entity<Author>()
-                .HasKey(author => author.Id);
-            modelBuilder.Entity<BookAuthor>()
-                .HasKey(ba => new { ba.AuthorId, ba.BookId });
-            
-
-            modelBuilder.Entity<BookAuthor>()
-                .HasOne(ba => ba.Book)
-                .WithMany(book => book.BookAuthors)
-                .HasForeignKey(ba => ba.BookId);
-            
-            modelBuilder.Entity<BookAuthor>()
-                .HasOne(ba => ba.Author)
-                .WithMany(author => author.BookAuthors)
-                .HasForeignKey(ba => ba.AuthorId);
+            //
+            // modelBuilder.Entity<Book>()
+            //     .HasKey(book => book.Id);
+            // modelBuilder.Entity<Author>()
+            //     .HasKey(author => author.Id);
+            // modelBuilder.Entity<BookAuthor>()
+            //     .HasKey(ba => new { ba.AuthorId, ba.BookId });
+            //
+            //
+            // modelBuilder.Entity<BookAuthor>()
+            //     .HasOne(ba => ba.Book)
+            //     .WithMany(book => book.BookAuthors)
+            //     .HasForeignKey(ba => ba.BookId);
+            //
+            // modelBuilder.Entity<BookAuthor>()
+            //     .HasOne(ba => ba.Author)
+            //     .WithMany(author => author.BookAuthors)
+            //     .HasForeignKey(ba => ba.AuthorId);
         }
 
         public DbSet<Book> Books { get; set; }
         public DbSet<Author> Authors { get; set; }
-        public DbSet<BookAuthor> BookAuthors { get; set; }
+        // public DbSet<BookAuthor> BookAuthors { get; set; }
     }
 }

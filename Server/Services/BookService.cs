@@ -15,7 +15,7 @@ public class BookService(LibraryDbContext context) : IBookService
     public async Task<ServiceResponse<List<BookDto>>> GetAllBooks()
     {
         var response = new ServiceResponse<List<BookDto>>();
-        var books = await _context.Books.ToListAsync();
+        var books = await _context.Books.Include(b=>b.Authors).ToListAsync();
 
         if (books == null)
         {
@@ -34,12 +34,7 @@ public class BookService(LibraryDbContext context) : IBookService
             PublishDate = book.PublishDate.ToString("yyyy-MM-dd"), // Convert DateOnly to string
             ISBN = book.ISBN,
             Description = book.Description,
-            ImageUrl = book.ImageUrl,
-            BookAuthors = book.BookAuthors.Select(ba => new BookAuthorDto
-            {
-                AuthorId = ba.AuthorId,
-                BookId = ba.BookId
-            }).ToList()
+            ImageUrl = book.ImageUrl
         }).ToList();
 
         return response;
@@ -66,12 +61,7 @@ public class BookService(LibraryDbContext context) : IBookService
             PublishDate = book.PublishDate.ToString("yyyy-MM-dd"), // Convert DateOnly to string
             ISBN = book.ISBN,
             Description = book.Description,
-            ImageUrl = book.ImageUrl,
-            BookAuthors = book.BookAuthors.Select(ba => new BookAuthorDto
-            {
-                AuthorId = ba.AuthorId,
-                BookId = ba.BookId
-            }).ToList()
+            ImageUrl = book.ImageUrl
         };
         return response;
     }
@@ -91,11 +81,6 @@ public class BookService(LibraryDbContext context) : IBookService
             ISBN = newBookDto.ISBN,
             Description = newBookDto.Description,
             ImageUrl = newBookDto.ImageUrl,
-            BookAuthors = newBookDto.BookAuthors.Select(ba => new BookAuthor
-            {
-                AuthorId = ba.AuthorId,
-                BookId = ba.BookId
-            }).ToList()
         };
         await _context.Books.AddAsync(newBook);
         await _context.SaveChangesAsync();
@@ -122,12 +107,6 @@ public class BookService(LibraryDbContext context) : IBookService
         book.ISBN = updateBookDto.ISBN;
         book.Description = updateBookDto.Description;
         book.ImageUrl = updateBookDto.ImageUrl;
-        book.BookAuthors = updateBookDto.BookAuthors.Select(ba => new BookAuthor
-        {
-            AuthorId = ba.AuthorId,
-            BookId = ba.BookId
-        }).ToList();
-
         await _context.SaveChangesAsync();
         response.Data = updateBookDto;
         return response;
@@ -155,11 +134,6 @@ public class BookService(LibraryDbContext context) : IBookService
             ISBN = book.ISBN,
             Description = book.Description,
             ImageUrl = book.ImageUrl,
-            BookAuthors = book.BookAuthors.Select(ba => new BookAuthorDto
-            {
-                AuthorId = ba.AuthorId,
-                BookId = ba.BookId
-            }).ToList()
         };
         return response;
     }

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.DataTransferObjects;
 using Shared.Models;
@@ -7,6 +8,7 @@ namespace Server.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[Authorize("Admin, ")]
 public class BookController(IBookService service) : Controller
 {
     // GetAll Book
@@ -18,6 +20,7 @@ public class BookController(IBookService service) : Controller
     
     // GetBookById
     [HttpGet("{id}")]
+    [AllowAnonymous]
     public async Task<ActionResult<ServiceResponse<BookDto>>> GetById(int id)
     {
         return await service.GetBookById(id);
@@ -43,8 +46,6 @@ public class BookController(IBookService service) : Controller
     {
         return await service.UpdateBook(updateBook);
     }
-    
-    
     //search book
 
     

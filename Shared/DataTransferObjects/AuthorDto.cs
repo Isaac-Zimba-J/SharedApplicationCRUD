@@ -6,5 +6,5 @@ public class AuthorDto
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public string Dob { get; set; }
-    public List<int> BookIds { get; set; }
+    public List<BookDto> Books { get; set; }
 }
