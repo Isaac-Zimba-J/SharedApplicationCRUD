@@ -1,62 +1,93 @@
+using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Server.Data;
+using Shared.DataTransferObjects;
 using Shared.Models;
 using Shared.Services;
 
 namespace Server.Services;
 
-public class AuthorService(LibraryDbContext context) : IAuthorService
+public class AuthorService : IAuthorService
 {
-    private readonly LibraryDbContext _context = context;
     
-    public async Task<ServiceResponse<List<Author>>> GetAllAuthors()
+    private readonly LibraryDbContext _context;
+    private readonly IMapper _mapper;
+
+    public AuthorService(LibraryDbContext context, IMapper mapper)
+    {
+        _context = context;
+        _mapper = mapper ;
+    }
+    
+    public async Task<ServiceResponse<List<AuthorDto>>> GetAllAuthors()
     {
         // throw new NotImplementedException();
-        ServiceResponse<List<Author>> response = new ServiceResponse<List<Author>>();
-        response.Data = _context.Authors.ToList();
-        return  response;
+        var response = new ServiceResponse<List<AuthorDto>>();
+        var authors = await _context.Authors.ToListAsync();
+        response.Data = _mapper.Map<List<AuthorDto>>(authors);
+        return response;
+
     }
 
-    public async Task<ServiceResponse<Author>> GetAuthorById(int id)
+    public async Task<ServiceResponse<AuthorDto>> GetAuthorById(int id)
     {
-        // throw new NotImplementedException();
-        ServiceResponse<Author> response = new ServiceResponse<Author>();
-        response.Data = _context.Authors.FirstOrDefault(author => author.Id == id);
+        var response = new ServiceResponse<AuthorDto>();
+        var author = await _context.Authors.FirstOrDefaultAsync(a => a.Id == id);
+        response.Data = _mapper.Map<AuthorDto>(author);
         return response;
     }
 
-    public async Task<ServiceResponse<Author>> AddAuthor(Author newAuthor)
-    {
-        // throw new NotImplementedException();
-        ServiceResponse<Author> response = new ServiceResponse<Author>();
-        _context.AddAsync(newAuthor);
-        _context.SaveChangesAsync();
-        response.Data = newAuthor;
-        return response;
-    }
-    
 
-    public async Task<ServiceResponse<Author>> UpdateAuthor(Author updateAuthor)
+    public async Task<ServiceResponse<AuthorDto>> AddAuthor(AuthorDto newAuthorDto)
     {
-        // throw new NotImplementedException();
-        ServiceResponse<Author> response = new ServiceResponse<Author>();
-        Author author = _context.Authors.FirstOrDefault(author => author.Id == updateAuthor.Id);
-        author.FirstName = updateAuthor.FirstName;
-        author.LastName = updateAuthor.LastName;
-        author.DOB = updateAuthor.DOB;
+        var response = new ServiceResponse<AuthorDto>();
+        var newAuthor = _mapper.Map<Author>(newAuthorDto);
+        await _context.AddAsync(newAuthor);
         await _context.SaveChangesAsync();
-        response.Data = author;
+        response.Data = _mapper.Map<AuthorDto>(newAuthor);
         return response;
-        
 
     }
+    
 
-    public async Task<ServiceResponse<Author>> DeleteAuthor(int id)
+    public async Task<ServiceResponse<AuthorDto>> UpdateAuthor(AuthorDto updateAuthorDto)
     {
         // throw new NotImplementedException();
-        ServiceResponse<Author> response = new ServiceResponse<Author>();
-        Author author = _context.Authors.FirstOrDefault(author => author.Id == id);
-       _context.Authors.Remove(author);
-        
-        return response;
+        var response = new ServiceResponse<AuthorDto>();
+        var author = await _context.Authors.FirstOrDefaultAsync(author => author.Id == updateAuthorDto.Id);
+        if (author == null)
+        {
+            response.Success = false;
+            response.Message = "Author not found.";
+            return response;
+        }
+        else
+        {
+            _mapper.Map(updateAuthorDto, author);
+            await _context.SaveChangesAsync();
+            response.Data = _mapper.Map<AuthorDto>(author);
+            return response;
+        }
+    }
+
+    public async Task<ServiceResponse<AuthorDto>> DeleteAuthor(int id)
+    {
+        // throw new NotImplementedException();
+        var response = new ServiceResponse<AuthorDto>();
+        var author = await _context.Authors.FirstOrDefaultAsync(author => author.Id == id);
+        if (author == null)
+        {
+            response.Success = false;
+            response.Message = "Author not found.";
+            return response;
+        }
+        else
+        {
+            _context.Authors.Remove(author);
+            await _context.SaveChangesAsync();
+            response.Data = _mapper.Map<AuthorDto>(author);
+            return response;
+        }
+
     }
 }

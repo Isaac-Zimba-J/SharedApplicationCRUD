@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Shared.DataTransferObjects;
 using Shared.Models;
 using Shared.Services;
 
@@ -10,45 +11,41 @@ public class BookController(IBookService service) : Controller
 {
     // GetAll Book
     [HttpGet]
-    public async Task<ActionResult<ServiceResponse<List<Book>>>> GetAll()
+    public async Task<ActionResult<ServiceResponse<List<BookDto>>>> GetAll()
     {
         return await service.GetAllBooks();
     }
     
     // GetBookById
     [HttpGet("{id}")]
-    public async Task<ActionResult<ServiceResponse<Book>>> GetById(int id)
+    public async Task<ActionResult<ServiceResponse<BookDto>>> GetById(int id)
     {
         return await service.GetBookById(id);
     }
     
     // Add book
     [HttpPost]
-    public async Task<ActionResult<ServiceResponse<Book>>> AddBook(Book book)
+    public async Task<ActionResult<ServiceResponse<BookDto>>> AddBook(BookDto book)
     {
         return await service.AddBook(book);
     }
     
     // Delete book
     [HttpDelete("{id}")]
-    public async Task<ActionResult<ServiceResponse<Book>>> DeleteBook(int id)
+    public async Task<ActionResult<ServiceResponse<BookDto>>> DeleteBook(int id)
     {
         return await service.DeleteBook(id);
     }
     
     //edit book
     [HttpPut]
-    public async Task<ActionResult<ServiceResponse<Book>>> EditBook(Book updateBook)
+    public async Task<ActionResult<ServiceResponse<BookDto>>> EditBook(BookDto updateBook)
     {
         return await service.UpdateBook(updateBook);
     }
     
     
     //search book
-    [HttpPost("Search")]
-    public async Task<ActionResult<ServiceResponse<Book>>> SearchBook([FromBody] string searchTerm)
-    {
-        return await service.SearchBook(searchTerm);
-    }
+
     
 }
