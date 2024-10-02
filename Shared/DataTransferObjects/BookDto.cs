@@ -11,5 +11,5 @@ public class BookDto
     public string ISBN { get; set; }
     public string Description { get; set; }
     public string ImageUrl { get; set; }
-    public List<int> AuthorIds { get; set; }
+    public List<BookAuthorDto> BookAuthors { get; set; }
 }
