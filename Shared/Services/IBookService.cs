@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Shared.DataTransferObjects;
 using Shared.Models;
 
@@ -11,4 +12,6 @@ public interface IBookService
     Task<ServiceResponse<BookDto>> UpdateBook(BookDto updateBookDto);
     Task<ServiceResponse<BookDto>> DeleteBook(int Id);
     Task<ServiceResponse<BookDto>> SearchBook(string query);
+    Task<ServiceResponse<FileUpload>> UplaodFile([FromForm] FileUpload model);
+    Task<ServiceResponse<string>> DownloadFile(string fileName);
 }

@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Server.Data;
 using Shared.Models;
@@ -7,7 +9,7 @@ using Shared.Enums;
 
 namespace Server.Services;
 
-public class BookService(LibraryDbContext context) : IBookService
+public class BookService(LibraryDbContext context, UserService service) : IBookService
 {
     private readonly LibraryDbContext _context = context;
 
@@ -142,4 +144,72 @@ public class BookService(LibraryDbContext context) : IBookService
     {
         throw new NotImplementedException();
     }
+
+    public async Task<ServiceResponse<FileUpload>> UplaodFile(FileUpload book)
+    {
+            var response = new ServiceResponse<FileUpload>();
+            if (book.File == null || book.File.Length == 0)
+            {
+                response.Success = false;
+                response.Message = "No file uploaded.";
+                return response;
+            }
+
+            var folderName = Path.Combine("resources", "files");
+            var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+            if (!Directory.Exists(pathToSave))
+            {
+                Directory.CreateDirectory(pathToSave);
+            }
+
+            var fileName = book.File.FileName;
+            var fullPath = Path.Combine(pathToSave, fileName);
+            var dbPath = Path.Combine(folderName, fileName);
+
+            if (System.IO.File.Exists(fullPath))
+            {
+                response.Success = false;
+                response.Message = "File already exists.";
+                return response;
+            }
+
+            using (var stream = new FileStream(fullPath, FileMode.Create))
+            {
+                await book.File.CopyToAsync(stream);
+            }
+            var currentUserResponse = await service.GetCurrentUser();
+            if (!currentUserResponse.Success)
+            {
+                response.Success = false;
+                response.Message = "Failed to get current user.";
+                return response;
+            }
+           
+            book.Author = currentUserResponse.Data?.UserName;
+            response.Data = book;
+            response.Success = true;
+            response.Message = "File uploaded successfully.";
+            return response;
+        }
+
+    public async Task<ServiceResponse<string>> DownloadFile(string fileName)
+    {
+        // throw new NotImplementedException();
+            var response = new ServiceResponse<string>();
+            var folderName = Path.Combine("resources", "files");
+            var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+            var fullPath = Path.Combine(pathToSave, fileName);
+
+            if (!System.IO.File.Exists(fullPath))
+            {
+                response.Success = false;
+                response.Message = "File not found.";
+                return response;
+            }
+
+            response.Data = fullPath;
+            response.Success = true;
+            response.Message = "File found successfully.";
+            return response;
+        }
 }

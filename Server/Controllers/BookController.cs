@@ -8,7 +8,7 @@ namespace Server.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-[Authorize("Admin, ")]
+// [Authorize("Admin, ")]
 public class BookController(IBookService service) : Controller
 {
     // GetAll Book
@@ -46,7 +46,29 @@ public class BookController(IBookService service) : Controller
     {
         return await service.UpdateBook(updateBook);
     }
-    //search book
+    //upload book
+    [HttpPost("upload"), DisableRequestSizeLimit]
+    public async Task<ActionResult<FileUpload>> Upload([FromForm]FileUpload book)
+    {
+        var response = await service.UplaodFile(book);
+        if (response.Success)
+        {
+            return Ok(response);
+        }
+        return BadRequest(response);
+    }
+    
+    //download book
+    [HttpGet("download/{fileName}")]
+    public async Task<ActionResult<ServiceResponse<string>>> Download(string fileName)
+    {
+        var response = await service.DownloadFile(fileName);
+        if (response.Success)
+        {
+            return Ok(response);
+        }
+        return BadRequest(response);
+    }
 
     
 }

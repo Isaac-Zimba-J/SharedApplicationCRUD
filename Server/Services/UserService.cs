@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using Server.Data;
 using Shared.Models;
 using Shared.Services;
+using Microsoft.AspNetCore.Identity;
+using Shared.DataTransferObjects;
 
 namespace Server.Services;
 
@@ -15,13 +17,17 @@ public class UserService : IUserService
     private readonly SignInManager<ApplicationUser> _signInManager;
     // private readonly RoleManager<IdentityRole> _roleManager;
     private readonly BaseDbContext _context;
+    private readonly HttpContext _httpContext;
+    private readonly IHttpContextAccessor _httpContextAccessor;
     
-    public UserService(UserManager<ApplicationUser> userManager,SignInManager<ApplicationUser> signInManager, BaseDbContext context)
+    public UserService(UserManager<ApplicationUser> userManager,SignInManager<ApplicationUser> signInManager, BaseDbContext context, HttpContext httpContext,IHttpContextAccessor httpContextAccessor)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         // _roleManager = roleManager;
         _context = context;
+        _httpContext = httpContext;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public Task<ServiceResponse<ApplicationUser>> GetUser()
@@ -29,9 +35,22 @@ public class UserService : IUserService
         throw new NotImplementedException();
     }
 
+    public async Task<ServiceResponse<ApplicationUser>> GetCurrentUser()
+    {
+        // throw new NotImplementedException();
+        var response = new ServiceResponse<ApplicationUser>();
+        // var user = await _userManager.GetUserAsync(_httpContext.User) ?? throw new Exception("User not found");
+        var user = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User) ?? throw new Exception("User not found");
+        
+        response.Data = user;
+        return response;
+    }
+    
+
     public Task<ServiceResponse<ApplicationUser>> GetUserById(string id)
     {
         throw new NotImplementedException();
+        
     }
 
     public Task<ServiceResponse<ApplicationUser>> GetUserByEmail(string email)
@@ -112,14 +131,6 @@ public class UserService : IUserService
             response.Message = "Email is not confirmed";
             return response;
         }
-
-
-        Console.WriteLine();
-        Console.WriteLine();
-        Console.WriteLine("printing the result "+student.PasswordHash );
-        Console.WriteLine("printing the result "+student.Email );
-        Console.WriteLine("printing the result "+user.Password );
-        Console.WriteLine();
         
         var result = await _signInManager.PasswordSignInAsync(
             userName: student.UserName, 

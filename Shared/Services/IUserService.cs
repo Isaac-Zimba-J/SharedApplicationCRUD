@@ -5,6 +5,7 @@ namespace Shared.Services;
 public interface IUserService
 {
     Task<ServiceResponse<ApplicationUser>> GetUser();
+    Task<ServiceResponse<ApplicationUser>> GetCurrentUser();
     Task<ServiceResponse<ApplicationUser>> GetUserById(string id);
     Task<ServiceResponse<ApplicationUser>>GetUserByEmail(string email);
     Task<ServiceResponse<ApplicationUser>> GetUserByStudentId(string studentId);
